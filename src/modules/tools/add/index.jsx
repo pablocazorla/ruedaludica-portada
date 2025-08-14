@@ -77,8 +77,12 @@ const AddElement = () => {
         okButton={{
           text: "Agregar",
           onClick: () => {
+            const idImageChanges =
+              currentTab === "image" ? { idImage: crypto.randomUUID() } : {};
+
             addElement({
               ...newElement,
+              ...idImageChanges,
               id: crypto.randomUUID(),
               type: currentTab,
               visible: true,

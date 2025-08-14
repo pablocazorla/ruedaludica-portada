@@ -1,11 +1,11 @@
 const renderImage = (ctx, ops, imagePool) => {
-  const img = imagePool.current[ops?.id];
+  const img = imagePool.current[ops?.idImage];
 
   if (!img) {
     return;
   }
 
-  const { x, y, scale, crop, show_crop, blur } = ops;
+  const { x, y, scale, crop, show_crop, blur, shadow } = ops;
 
   ctx.save();
   ctx.globalAlpha = ops?.opacity || 1;
@@ -21,6 +21,26 @@ const renderImage = (ctx, ops, imagePool) => {
   const width_crop = ops?.width_crop || 300;
   const height_crop = ops?.height_crop || 300;
 
+  if (shadow) {
+    var arrShadow = shadow.split(" ");
+    if (arrShadow[0]) ctx.shadowOffsetX = parseInt(arrShadow[0], 10);
+    if (arrShadow[1]) ctx.shadowOffsetY = parseInt(arrShadow[1], 10);
+    if (arrShadow[2]) ctx.shadowBlur = parseInt(arrShadow[2], 10);
+    if (arrShadow[3]) ctx.shadowColor = arrShadow[3];
+
+    if (crop) {
+      ctx.fillStyle = "#000000";
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + width_crop, y);
+      ctx.lineTo(x + width_crop, y + height_crop);
+      ctx.lineTo(x, y + height_crop);
+      ctx.fill();
+      ctx.closePath();
+    }
+  }
+
+  ctx.save();
   if (crop) {
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -47,10 +67,8 @@ const renderImage = (ctx, ops, imagePool) => {
     height_d
   );
 
+  ctx.restore();
   if (crop && show_crop) {
-    if (blur > 0) {
-      ctx.filter = "blur(0px)";
-    }
     ctx.strokeStyle = "#F00";
     ctx.lineWidth = 4;
     ctx.beginPath();

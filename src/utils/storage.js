@@ -1,11 +1,11 @@
 const STORAGE_KEY = "RUEDA_LUDICA_STORAGE";
 
 const storage = {
-  getItem: () => {
-    return localStorage.getItem(STORAGE_KEY) || null;
+  getItem: (name) => {
+    return localStorage.getItem(STORAGE_KEY + "_" + name) || null;
   },
-  setItem: (value) => {
-    localStorage.setItem(STORAGE_KEY, value);
+  setItem: (name, value) => {
+    localStorage.setItem(STORAGE_KEY + "_" + name, value);
   },
 };
 

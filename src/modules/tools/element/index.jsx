@@ -24,8 +24,13 @@ const Element = ({ element, index }) => {
 
   const onChange = useCallback(
     (name, value) => {
+      const idImageChanges =
+        name === "url" && element.type === "image"
+          ? { idImage: crypto.randomUUID() }
+          : {};
       updateElement({
         ...element,
+        ...idImageChanges,
         [name]: value,
       });
     },

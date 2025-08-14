@@ -18,6 +18,8 @@ export const ImageLabel = ({ element }) => {
 
 const ImageTool = ({ element, onChange }) => {
   const {
+    url,
+    name,
     x,
     y,
     scale,
@@ -29,6 +31,7 @@ const ImageTool = ({ element, onChange }) => {
     width_crop,
     height_crop,
     blur,
+    shadow,
   } = {
     ...ELEMENT_TYPES.image.defaultValue,
     ...element,
@@ -36,6 +39,15 @@ const ImageTool = ({ element, onChange }) => {
 
   return (
     <>
+      <UploadWidget name="url" onChange={onChange} />
+      <InputText label="url" value={url} name="url" onChange={onChange} />
+      <Textarea
+        label="name"
+        value={name}
+        name="name"
+        onChange={onChange}
+        classNameInput="h-6 resize-none rounded"
+      />
       <div className="flex items-center gap-3">
         <InputNumber label="x" value={x} name="x" onChange={onChange} />
         <InputNumber label="y" value={y} name="y" onChange={onChange} />
@@ -48,13 +60,14 @@ const ImageTool = ({ element, onChange }) => {
           step={0.005}
         />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-2">
         <InputNumber
           label="blur"
           value={blur}
           name="blur"
           onChange={onChange}
           min={0}
+          className="w-[60px]"
         />
         <InputNumber
           label="opacity"
@@ -64,7 +77,17 @@ const ImageTool = ({ element, onChange }) => {
           min={0}
           max={1}
           step={0.05}
+          className="w-[70px]"
         />
+
+        <InputText
+          label="shadow"
+          value={shadow}
+          name="shadow"
+          onChange={onChange}
+        />
+      </div>
+      <div className="">
         <Switch label="recortar" value={crop} name="crop" onChange={onChange} />
       </div>
       {crop ? (
@@ -111,7 +134,7 @@ const ImageTool = ({ element, onChange }) => {
 };
 
 export const ImageLoader = ({ element, onChange }) => {
-  const { url, name } = element;
+  const { url } = element;
 
   return (
     <>
@@ -122,11 +145,6 @@ export const ImageLoader = ({ element, onChange }) => {
           </div>
         </div>
         <div className="flex-1">
-          <div className="">
-            <UploadWidget name="url" onChange={onChange} />
-          </div>
-          <InputText label="url" value={url} name="url" onChange={onChange} />
-          <Textarea label="name" value={name} name="name" onChange={onChange} />
           <ImageTool element={element} onChange={onChange} />
         </div>
       </div>

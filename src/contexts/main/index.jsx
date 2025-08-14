@@ -1,10 +1,16 @@
 import storage from "@/utils/storage";
 import { createContext, useEffect, useRef, useState } from "react";
 import moveElement from "@/utils/moveElement";
+import { PORTADA_SIZE } from "@/config/constants";
 
-let t = 0;
+const portadaSizeIdDefault = Object.keys(PORTADA_SIZE)[0];
+
+const STORAGE_KEY_LIST = "LIST";
+const STORAGE_KEY_PORTADA_ID = "PORTADA_ID";
 
 export const MainContext = createContext({
+  portadaSizeId: portadaSizeIdDefault,
+  setPortadaSizeId: () => {},
   elementList: [],
   updateList: () => {},
   addElement: () => {},
@@ -17,22 +23,29 @@ export const MainContext = createContext({
 });
 
 export const MainContextProvider = ({ children }) => {
+  const [portadaSizeId, set_portadaSizeId] = useState(portadaSizeIdDefault);
   const [elementList, setElementList] = useState([]);
 
   useEffect(() => {
-    const storedValue = storage.getItem();
-    if (!storedValue) {
-      return;
+    const storedValueList = storage.getItem(STORAGE_KEY_LIST);
+    if (storedValueList) {
+      const storeList = JSON.parse(storedValueList);
+      setElementList(storeList.elementList);
     }
-
-    const store = JSON.parse(storedValue);
-    setElementList(store.elementList);
+    //
+    const storedValuePortadaId = storage.getItem(STORAGE_KEY_PORTADA_ID);
+    if (storedValuePortadaId) {
+      set_portadaSizeId(storedValuePortadaId);
+    }
   }, []);
 
   const addElement = (element) => {
     setElementList((oldElementList) => {
       const newElementList = [...oldElementList, element];
-      storage.setItem(JSON.stringify({ elementList: newElementList }));
+      storage.setItem(
+        STORAGE_KEY_LIST,
+        JSON.stringify({ elementList: newElementList })
+      );
       return newElementList;
     });
   };
@@ -45,7 +58,10 @@ export const MainContextProvider = ({ children }) => {
         }
         return element;
       });
-      storage.setItem(JSON.stringify({ elementList: newElementList }));
+      storage.setItem(
+        STORAGE_KEY_LIST,
+        JSON.stringify({ elementList: newElementList })
+      );
       return newElementList;
     });
   };
@@ -53,7 +69,10 @@ export const MainContextProvider = ({ children }) => {
   const moveUpDownElement = (index, dir) => {
     setElementList((oldElementList) => {
       const newElementList = moveElement(oldElementList, index, index + dir);
-      storage.setItem(JSON.stringify({ elementList: newElementList }));
+      storage.setItem(
+        STORAGE_KEY_LIST,
+        JSON.stringify({ elementList: newElementList })
+      );
       return newElementList;
     });
   };
@@ -63,14 +82,20 @@ export const MainContextProvider = ({ children }) => {
       const newElementList = [...oldElementList].filter(
         (element) => element.id !== id
       );
-      storage.setItem(JSON.stringify({ elementList: newElementList }));
+      storage.setItem(
+        STORAGE_KEY_LIST,
+        JSON.stringify({ elementList: newElementList })
+      );
       return newElementList;
     });
   };
 
   const updateList = (updatedList) => {
     setElementList(updatedList);
-    storage.setItem(JSON.stringify({ elementList: updatedList }));
+    storage.setItem(
+      STORAGE_KEY_LIST,
+      JSON.stringify({ elementList: updatedList })
+    );
   };
 
   /////////////////////////
@@ -88,15 +113,15 @@ export const MainContextProvider = ({ children }) => {
 
     let countLoaded = 0;
 
-    imageList.forEach(({ url, id }) => {
-      if (imagePool.current[id]) {
+    imageList.forEach(({ url, idImage }) => {
+      if (imagePool.current[idImage]) {
         countLoaded++;
         return;
       }
       setImagesLoaded(false);
       const img = new Image();
       img.src = url;
-      imagePool.current[id] = img;
+      imagePool.current[idImage] = img;
       img.onload = () => {
         countLoaded++;
         if (countLoaded === imageList.length) {
@@ -112,9 +137,16 @@ export const MainContextProvider = ({ children }) => {
     });
   }, [elementList]);
 
+  const setPortadaSizeId = (id) => {
+    set_portadaSizeId(id);
+    storage.setItem(STORAGE_KEY_PORTADA_ID, id);
+  };
+
   return (
     <MainContext.Provider
       value={{
+        portadaSizeId,
+        setPortadaSizeId,
         elementList,
         updateList,
         addElement,

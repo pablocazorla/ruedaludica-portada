@@ -1,5 +1,3 @@
-import { PORTADA_WIDTH, PORTADA_HEIGHT } from "@/config/constants";
-
 import renderText from "./text";
 import renderRect from "./rect";
 import renderCircle from "./circle";
@@ -7,9 +5,9 @@ import renderPolygon from "./polygon";
 import renderStar from "./star";
 import renderImage from "./image";
 
-const renderCanvas = (canvas, elementList, imagePool) => {
+const renderCanvas = (canvas, elementList, imagePool, portadaSize) => {
   const ctx = canvas.getContext("2d");
-  ctx.fillRect(0, 0, PORTADA_WIDTH, PORTADA_HEIGHT);
+  ctx.fillRect(0, 0, portadaSize.width, portadaSize.height);
 
   elementList.forEach((element) => {
     if (!element.visible) {

@@ -54,6 +54,7 @@ const ELEMENT_TYPES = {
     name: "Imagen",
     type: "image",
     defaultValue: {
+      idImage: "",
       name: "",
       url: "",
       x: 0,
@@ -67,6 +68,7 @@ const ELEMENT_TYPES = {
       width_crop: 300,
       height_crop: 300,
       blur: 0,
+      shadow: "",
     },
   },
   circle: {

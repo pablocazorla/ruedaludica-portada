@@ -3,6 +3,7 @@ export const partidaVivo = {
   elementList: [
     {
       id: "149",
+      idImage: "12445",
       visible: true,
       type: "image",
       x: 0,
