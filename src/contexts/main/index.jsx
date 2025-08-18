@@ -23,6 +23,7 @@ export const MainContext = createContext({
   duplicateElement: () => {},
   imagePool: { current: {} },
   imagesLoaded: false,
+  saveContent: () => {},
 });
 
 export const MainContextProvider = ({ children }) => {
@@ -31,10 +32,13 @@ export const MainContextProvider = ({ children }) => {
 
   const [moveRatio, setMoveRatio] = useState(1);
 
+  const elementListRef = useRef([]);
+
   useEffect(() => {
     const storedValueList = storage.getItem(STORAGE_KEY_LIST);
     if (storedValueList) {
       const storeList = JSON.parse(storedValueList);
+      elementListRef.current = storeList.elementList;
       setElementList(storeList.elementList);
     }
     //
@@ -72,10 +76,11 @@ export const MainContextProvider = ({ children }) => {
   const addElement = (element) => {
     setElementList((oldElementList) => {
       const newElementList = [...oldElementList, element];
-      storage.setItem(
-        STORAGE_KEY_LIST,
-        JSON.stringify({ elementList: newElementList })
-      );
+      // storage.setItem(
+      //   STORAGE_KEY_LIST,
+      //   JSON.stringify({ elementList: newElementList })
+      // );
+      elementListRef.current = newElementList;
       return newElementList;
     });
   };
@@ -88,11 +93,11 @@ export const MainContextProvider = ({ children }) => {
         }
         return element;
       });
-      console.log(newElementList);
-      storage.setItem(
-        STORAGE_KEY_LIST,
-        JSON.stringify({ elementList: newElementList })
-      );
+      // storage.setItem(
+      //   STORAGE_KEY_LIST,
+      //   JSON.stringify({ elementList: newElementList })
+      // );
+      elementListRef.current = newElementList;
       return newElementList;
     });
   };
@@ -100,10 +105,11 @@ export const MainContextProvider = ({ children }) => {
   const moveUpDownElement = (index, dir) => {
     setElementList((oldElementList) => {
       const newElementList = moveElement(oldElementList, index, index + dir);
-      storage.setItem(
-        STORAGE_KEY_LIST,
-        JSON.stringify({ elementList: newElementList })
-      );
+      // storage.setItem(
+      //   STORAGE_KEY_LIST,
+      //   JSON.stringify({ elementList: newElementList })
+      // );
+      elementListRef.current = newElementList;
       return newElementList;
     });
   };
@@ -113,20 +119,22 @@ export const MainContextProvider = ({ children }) => {
       const newElementList = [...oldElementList].filter(
         (element) => element.id !== id
       );
-      storage.setItem(
-        STORAGE_KEY_LIST,
-        JSON.stringify({ elementList: newElementList })
-      );
+      // storage.setItem(
+      //   STORAGE_KEY_LIST,
+      //   JSON.stringify({ elementList: newElementList })
+      // );
+      elementListRef.current = newElementList;
       return newElementList;
     });
   };
 
   const updateList = (updatedList) => {
     setElementList(updatedList);
-    storage.setItem(
-      STORAGE_KEY_LIST,
-      JSON.stringify({ elementList: updatedList })
-    );
+    // storage.setItem(
+    //   STORAGE_KEY_LIST,
+    //   JSON.stringify({ elementList: updatedList })
+    // );
+    elementListRef.current = updatedList;
   };
 
   const duplicateElement = (id) => {
@@ -139,10 +147,11 @@ export const MainContextProvider = ({ children }) => {
           newElementList.push({ ...element, id: getUUID() + "_d" });
         }
       });
-      storage.setItem(
-        STORAGE_KEY_LIST,
-        JSON.stringify({ elementList: newElementList })
-      );
+      // storage.setItem(
+      //   STORAGE_KEY_LIST,
+      //   JSON.stringify({ elementList: newElementList })
+      // );
+      elementListRef.current = newElementList;
       return newElementList;
     });
   };
@@ -198,6 +207,35 @@ export const MainContextProvider = ({ children }) => {
     storage.setItem(STORAGE_KEY_PORTADA_ID, id);
   };
 
+  const saveContent = () => {
+    // storage.setItem(
+    //   STORAGE_KEY_LIST,
+    //   JSON.stringify({ elementList: elementListRef.current })
+    // );
+  };
+
+  useEffect(() => {
+    let count = 1;
+
+    const saveContentStorage = () => {
+      if (elementListRef.current) {
+        console.log(`Guardando nº ${count++}`);
+        storage.setItem(
+          STORAGE_KEY_LIST,
+          JSON.stringify({ elementList: elementListRef.current })
+        );
+      }
+    };
+
+    let timer = setInterval(() => {
+      saveContentStorage();
+    }, 20000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
   return (
     <MainContext.Provider
       value={{
@@ -214,6 +252,7 @@ export const MainContextProvider = ({ children }) => {
         duplicateElement,
         imagePool,
         imagesLoaded,
+        saveContent,
       }}
     >
       {children}
