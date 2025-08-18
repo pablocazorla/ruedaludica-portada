@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback, useContext, useMemo } from "react";
 import { MainContext } from "@/contexts/main";
 import { IconChevronRight } from "@/components/icons/chevronRight";
 import TextTool, { TextLabel } from "../text";
@@ -9,12 +9,22 @@ import PolygonTool, { PolygonLabel } from "../polygon";
 import StarTool, { StarLabel } from "../star";
 import { cx } from "@/utils/cx";
 import { IconEye } from "@/components/icons/eye";
+import getUUID from "@/utils/getUUID";
+import ELEMENT_TYPES from "@/config/elementTypes";
+import { PORTADA_SIZE } from "@/config/constants";
 
 const Element = ({ element, index }) => {
-  const { updateElement, moveUpDownElement, removeElement } =
-    useContext(MainContext);
+  const {
+    updateElement,
+    moveUpDownElement,
+    removeElement,
+    duplicateElement,
+    portadaSizeId,
+  } = useContext(MainContext);
 
-  const { id, type, visible } = element;
+  const { id, type } = element;
+
+  const { visible } = element[portadaSizeId] || { visible: true };
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,31 +36,48 @@ const Element = ({ element, index }) => {
     (name, value) => {
       const idImageChanges =
         name === "url" && element.type === "image"
-          ? { idImage: crypto.randomUUID() }
+          ? { idImage: getUUID() }
           : {};
       updateElement({
         ...element,
-        ...idImageChanges,
-        [name]: value,
+        [portadaSizeId]: {
+          ...element[portadaSizeId],
+          ...idImageChanges,
+          [name]: value,
+        },
       });
     },
-    [element]
+    [updateElement, element, portadaSizeId]
   );
+
+  const transferFromOtherPortadaSize = useCallback(
+    (oldPortadaId) => {
+      updateElement({
+        ...element,
+        [portadaSizeId]: {
+          ...element[oldPortadaId],
+        },
+      });
+    },
+    [updateElement, element, portadaSizeId]
+  );
+
+  const elem = element[portadaSizeId] || ELEMENT_TYPES[type].defaultValue;
 
   const lab = (() => {
     switch (type) {
       case "text":
-        return <TextLabel element={element} />;
+        return <TextLabel element={elem} />;
       case "rect":
-        return <RectLabel element={element} />;
+        return <RectLabel element={elem} />;
       case "image":
-        return <ImageLabel element={element} />;
+        return <ImageLabel element={elem} />;
       case "circle":
-        return <CircleLabel element={element} />;
+        return <CircleLabel element={elem} />;
       case "polygon":
-        return <PolygonLabel element={element} />;
+        return <PolygonLabel element={elem} />;
       case "star":
-        return <StarLabel element={element} />;
+        return <StarLabel element={elem} />;
       default:
         return null;
     }
@@ -58,21 +85,33 @@ const Element = ({ element, index }) => {
   const content = (() => {
     switch (type) {
       case "text":
-        return <TextTool element={element} onChange={onChange} />;
+        return <TextTool element={elem} onChange={onChange} />;
       case "rect":
-        return <RectTool element={element} onChange={onChange} />;
+        return <RectTool element={elem} onChange={onChange} />;
       case "image":
-        return <ImageTool element={element} onChange={onChange} />;
+        return <ImageTool element={elem} onChange={onChange} />;
       case "circle":
-        return <CircleTool element={element} onChange={onChange} />;
+        return <CircleTool element={elem} onChange={onChange} />;
       case "polygon":
-        return <PolygonTool element={element} onChange={onChange} />;
+        return <PolygonTool element={elem} onChange={onChange} />;
       case "star":
-        return <StarTool element={element} onChange={onChange} />;
+        return <StarTool element={elem} onChange={onChange} />;
       default:
         return null;
     }
   })();
+
+  const ListTransfer = useMemo(() => {
+    return Object.keys(PORTADA_SIZE).filter((key) => {
+      if (key === portadaSizeId) {
+        return false;
+      }
+      if (element[key]) {
+        return true;
+      }
+      return false;
+    });
+  }, [portadaSizeId]);
 
   return (
     <div
@@ -125,7 +164,27 @@ const Element = ({ element, index }) => {
       </div>
       {isOpen && visible && (
         <div className="p-3 pt-0 border-t border-gray-500 border-dashed">
-          <div className="flex justify-end pt-1">
+          <div className="flex justify-end pt-1 gap-3">
+            {ListTransfer.map((opt) => {
+              return (
+                <button
+                  key={opt}
+                  className=" uppercase text-[10px] p-1 text-sky-500 hover:bg-green-900 cursor-pointer transition-colors rounded"
+                  onClick={() => {
+                    transferFromOtherPortadaSize(opt);
+                  }}
+                >
+                  {`transferir desde ${opt}`}
+                </button>
+              );
+            })}
+
+            <button
+              className=" uppercase text-[10px] p-1 text-green-500 hover:bg-green-900 cursor-pointer transition-colors rounded"
+              onClick={() => duplicateElement(id)}
+            >
+              duplicar
+            </button>
             <button
               className=" uppercase text-[10px] p-1 text-red-500 hover:bg-red-900 cursor-pointer transition-colors rounded"
               onClick={() => removeElement(id)}

@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Label from "./label";
 import Container from "./container";
+import { MainContext } from "@/contexts/main";
 
-const InputNumber = ({ label, name, value, onChange, className, ...rest }) => {
-  const [v, setV] = useState("");
-
-  useEffect(() => {
-    setV(value);
-  }, [value]);
+const InputNumber = ({
+  label,
+  name,
+  value,
+  onChange,
+  className,
+  step = 1,
+  ...rest
+}) => {
+  const { moveRatio } = useContext(MainContext);
 
   return (
     <Container className={className}>
@@ -19,6 +24,7 @@ const InputNumber = ({ label, name, value, onChange, className, ...rest }) => {
         onChange={(e) => {
           if (onChange) onChange(name, parseFloat(e.target.value));
         }}
+        step={step * moveRatio}
         {...rest}
       />
     </Container>

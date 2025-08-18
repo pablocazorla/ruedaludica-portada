@@ -10,6 +10,7 @@ import { ImageLoader } from "../image";
 import CircleTool from "../circle";
 import PolygonTool from "../polygon";
 import StarTool from "../star";
+import getUUID from "@/utils/getUUID";
 
 const tabList = Object.values(ELEMENT_TYPES).map(
   ({ name: text, type: value }) => {
@@ -18,7 +19,7 @@ const tabList = Object.values(ELEMENT_TYPES).map(
 );
 
 const AddElement = () => {
-  const { addElement } = useContext(MainContext);
+  const { addElement, portadaSizeId } = useContext(MainContext);
 
   const [open, setOpen] = useState(false);
   const toggle = () => {
@@ -64,7 +65,7 @@ const AddElement = () => {
       content = <StarTool element={newElement} onChange={onChange} />;
       break;
     default:
-      content = "pablito";
+      content = null;
       break;
   }
 
@@ -78,14 +79,16 @@ const AddElement = () => {
           text: "Agregar",
           onClick: () => {
             const idImageChanges =
-              currentTab === "image" ? { idImage: crypto.randomUUID() } : {};
+              currentTab === "image" ? { idImage: getUUID() } : {};
 
             addElement({
-              ...newElement,
-              ...idImageChanges,
-              id: crypto.randomUUID(),
+              [portadaSizeId]: {
+                ...newElement,
+                ...idImageChanges,
+                visible: true,
+              },
+              id: getUUID(),
               type: currentTab,
-              visible: true,
             });
             toggle();
           },

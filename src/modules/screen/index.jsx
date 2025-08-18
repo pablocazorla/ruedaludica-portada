@@ -1,5 +1,5 @@
 import { PORTADA_SIZE } from "@/config/constants";
-import { useEffect, useRef, useContext, useState } from "react";
+import { useEffect, useRef, useContext } from "react";
 import Nav from "@/components/nav";
 import { MainContext } from "@/contexts/main";
 import renderCanvas from "@/utils/canvas/renderCanvas";
@@ -26,12 +26,7 @@ const Screen = () => {
 
   useEffect(() => {
     if (imagesLoaded) {
-      renderCanvas(
-        canvasNode.current,
-        elementList,
-        imagePool,
-        PORTADA_SIZE[portadaSizeId]
-      );
+      renderCanvas(canvasNode.current, elementList, imagePool, portadaSizeId);
     }
   }, [elementList, imagePool, imagesLoaded, portadaSizeId]);
 
