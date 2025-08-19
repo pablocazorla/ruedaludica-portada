@@ -1,8 +1,8 @@
 import { PORTADA_SIZE } from "@/config/constants";
-import { useEffect, useRef, useContext } from "react";
+import { useContext, useMemo } from "react";
 import Nav from "@/components/nav";
 import { MainContext } from "@/contexts/main";
-import renderCanvas from "@/utils/canvas/renderCanvas";
+import Canvas from "./canvas";
 
 const tabList = Object.values(PORTADA_SIZE).map(
   ({ title, type: value, width, height }) => {
@@ -14,23 +14,41 @@ const tabList = Object.values(PORTADA_SIZE).map(
 );
 
 const Screen = () => {
-  const canvasNode = useRef(null);
-
   const {
+    elementSelected,
+    setElementSelected,
     elementList,
-    imagePool,
-    imagesLoaded,
     portadaSizeId,
     setPortadaSizeId,
   } = useContext(MainContext);
 
-  useEffect(() => {
-    if (imagesLoaded) {
-      renderCanvas(canvasNode.current, elementList, imagePool, portadaSizeId);
-    }
-  }, [elementList, imagePool, imagesLoaded, portadaSizeId]);
+  const idSelected = useMemo(() => {
+    return elementSelected?.id || null;
+  }, [elementSelected]);
 
-  const { width, height } = PORTADA_SIZE[portadaSizeId];
+  const [elementsPrev, elementsPost] = useMemo(() => {
+    if (!idSelected) {
+      return [elementList, []];
+    }
+
+    const elemPrev = [];
+    const elemPost = [];
+    let isPrev = true;
+
+    elementList.forEach((element) => {
+      if (element.id === idSelected) {
+        isPrev = false;
+      } else {
+        if (isPrev) {
+          elemPrev.push(element);
+        } else {
+          elemPost.push(element);
+        }
+      }
+    });
+
+    return [elemPrev, elemPost];
+  }, [elementList, idSelected]);
 
   return (
     <div className="flex-1 h-screen grid place-content-center overflow-hidden select-none">
@@ -43,12 +61,27 @@ const Screen = () => {
             className="mb-5 text-xs"
           />
         </div>
-        <canvas
-          width={width}
-          height={height}
-          className="block bg-black w-full h-full shadow-[0_0_0_1px_#000]"
-          ref={canvasNode}
-        />
+        <div
+          className="relative w-full h-full"
+          onClick={() => {
+            setElementSelected(null);
+          }}
+        >
+          <Canvas
+            list={elementsPrev}
+            className="bg-black shadow-[0_0_0_1px_#000]"
+            isBase
+          />
+          {elementSelected ? (
+            <Canvas
+              list={[elementSelected]}
+              className="absolute top-0 left-0"
+            />
+          ) : null}
+          {elementsPost.length > 0 ? (
+            <Canvas list={elementsPost} className="absolute top-0 left-0" />
+          ) : null}
+        </div>
       </div>
     </div>
   );

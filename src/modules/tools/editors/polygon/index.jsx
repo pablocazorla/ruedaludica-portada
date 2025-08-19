@@ -2,33 +2,46 @@ import InputColor from "@/components/inputs/color";
 import InputNumber from "@/components/inputs/number";
 import InputText from "@/components/inputs/text";
 
-export const CircleLabel = ({ element }) => {
-  return (
-    <div className="flex items-center gap-1 text-sm">
-      <div className="font-bold">Círculo:</div>
-      <div
-        className="w-5 aspect-square rounded-full"
-        style={{ backgroundColor: element.color }}
-      ></div>
-    </div>
-  );
-};
-
-const CircleTool = ({ element, onChange }) => {
-  const { x, y, radius, color, borderColor, borderWidth, opacity, shadow } =
-    element;
+const PolygonTool = ({ element, onChange }) => {
+  const {
+    x,
+    y,
+    sides,
+    size,
+    color,
+    borderColor,
+    borderWidth,
+    rotation,
+    opacity,
+    shadow,
+  } = element;
 
   return (
     <div className="">
       <div className="flex items-center gap-3">
         <InputNumber label="x" value={x} name="x" onChange={onChange} />
         <InputNumber label="y" value={y} name="y" onChange={onChange} />
+      </div>
+      <div className="flex items-center gap-3">
         <InputNumber
-          label="radius"
-          value={radius}
-          name="radius"
+          label="sides"
+          value={sides}
+          name="sides"
           onChange={onChange}
-          min={0}
+          min={3}
+        />
+        <InputNumber
+          label="Lado"
+          value={size}
+          name="size"
+          onChange={onChange}
+          min={5}
+        />
+        <InputNumber
+          label="rotation"
+          value={rotation}
+          name="rotation"
+          onChange={onChange}
         />
       </div>
       <div className="flex items-center gap-3">
@@ -69,9 +82,8 @@ const CircleTool = ({ element, onChange }) => {
           onChange={onChange}
         />
       </div>
-      <div className="flex items-center gap-3"></div>
     </div>
   );
 };
 
-export default CircleTool;
+export default PolygonTool;

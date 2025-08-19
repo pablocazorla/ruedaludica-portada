@@ -4,12 +4,12 @@ import Nav from "@/components/nav";
 import { useState, useContext } from "react";
 import { MainContext } from "@/contexts/main";
 import ELEMENT_TYPES from "@/config/elementTypes";
-import TextTool from "../text";
-import RectTool from "../rect";
-import { ImageLoader } from "../image";
-import CircleTool from "../circle";
-import PolygonTool from "../polygon";
-import StarTool from "../star";
+import TextTool from "../editors/text";
+import RectTool from "../editors/rect";
+import { ImageLoader } from "../editors/image";
+import CircleTool from "../editors/circle";
+import PolygonTool from "../editors/polygon";
+import StarTool from "../editors/star";
 import getUUID from "@/utils/getUUID";
 
 const tabList = Object.values(ELEMENT_TYPES).map(

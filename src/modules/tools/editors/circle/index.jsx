@@ -2,50 +2,15 @@ import InputColor from "@/components/inputs/color";
 import InputNumber from "@/components/inputs/number";
 import InputText from "@/components/inputs/text";
 
-export const RectLabel = ({ element }) => {
-  return (
-    <div className="flex items-center gap-1 text-sm">
-      <div className="font-bold">Rectángulo:</div>
-      <div className="h-5 w-7" style={{ backgroundColor: element.color }}></div>
-    </div>
-  );
-};
-
-const RectTool = ({ element, onChange }) => {
-  const {
-    x,
-    y,
-    width,
-    height,
-    color,
-    borderColor,
-    borderWidth,
-    radius,
-    opacity,
-    shadow,
-  } = element;
+const CircleTool = ({ element, onChange }) => {
+  const { x, y, radius, color, borderColor, borderWidth, opacity, shadow } =
+    element;
 
   return (
     <div className="">
       <div className="flex items-center gap-3">
         <InputNumber label="x" value={x} name="x" onChange={onChange} />
         <InputNumber label="y" value={y} name="y" onChange={onChange} />
-      </div>
-      <div className="flex items-center gap-3">
-        <InputNumber
-          label="width"
-          value={width}
-          name="width"
-          onChange={onChange}
-          min={10}
-        />
-        <InputNumber
-          label="height"
-          value={height}
-          name="height"
-          onChange={onChange}
-          min={10}
-        />
         <InputNumber
           label="radius"
           value={radius}
@@ -97,4 +62,4 @@ const RectTool = ({ element, onChange }) => {
   );
 };
 
-export default RectTool;
+export default CircleTool;

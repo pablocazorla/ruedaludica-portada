@@ -7,10 +7,21 @@ import renderPolygon from "./polygon";
 import renderStar from "./star";
 import renderImage from "./image";
 
-const renderCanvas = (canvas, elementList, imagePool, portadaSizeId) => {
+const renderCanvas = (
+  canvas,
+  elementList,
+  imagePool,
+  portadaSizeId,
+  isBase
+) => {
   const ctx = canvas.getContext("2d");
   const portadaSize = PORTADA_SIZE[portadaSizeId];
-  ctx.fillRect(0, 0, portadaSize.width, portadaSize.height);
+  if (isBase) {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, portadaSize.width, portadaSize.height);
+  } else {
+    ctx.clearRect(0, 0, portadaSize.width, portadaSize.height);
+  }
 
   elementList.forEach((element) => {
     const elem =

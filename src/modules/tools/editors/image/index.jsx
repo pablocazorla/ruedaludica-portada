@@ -5,17 +5,6 @@ import Textarea from "@/components/inputs/textarea";
 import ELEMENT_TYPES from "@/config/elementTypes";
 import UploadWidget from "@/components/uploader";
 
-export const ImageLabel = ({ element }) => {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <div className="h-6">
-        <img src={element.url} className="w-full h-full" />
-      </div>
-      <div className="font-bold">{element.name}</div>
-    </div>
-  );
-};
-
 const ImageTool = ({ element, onChange }) => {
   const {
     url,

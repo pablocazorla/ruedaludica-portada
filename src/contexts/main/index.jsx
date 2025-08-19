@@ -14,10 +14,12 @@ export const MainContext = createContext({
   setPortadaSizeId: () => {},
   moveRatio: 1,
   elementList: [],
+  elementSelected: null,
+  setElementSelected: () => {},
   updateList: () => {},
   addElement: () => {},
   removeElement: () => {},
-  updateElement: () => {},
+  toggleElementVisibility: () => {},
   moveUpDownElement: () => {},
   removeElement: () => {},
   duplicateElement: () => {},
@@ -30,10 +32,13 @@ export const MainContextProvider = ({ children }) => {
   const [portadaSizeId, set_portadaSizeId] = useState(portadaSizeIdDefault);
   const [elementList, setElementList] = useState([]);
 
+  const [elementSelected, set_elementSelected] = useState(null);
+
   const [moveRatio, setMoveRatio] = useState(1);
 
   const elementListRef = useRef([]);
 
+  // LOAD FROM STORAGE ---------------------------------
   useEffect(() => {
     const storedValueList = storage.getItem(STORAGE_KEY_LIST);
     if (storedValueList) {
@@ -46,8 +51,15 @@ export const MainContextProvider = ({ children }) => {
     if (storedValuePortadaId) {
       set_portadaSizeId(storedValuePortadaId);
     }
-    //
+  }, []);
 
+  // SAVE CONTENT --------------------------------------
+  const saveContent = (list) => {
+    storage.setItem(STORAGE_KEY_LIST, JSON.stringify({ elementList: list }));
+  };
+
+  // SETUP KEYBOARD EVENTS --------------------------------------
+  useEffect(() => {
     let isMoveRatioHigher = false;
 
     const changeMoveRatioToHigh = (e) => {
@@ -73,91 +85,88 @@ export const MainContextProvider = ({ children }) => {
     };
   }, []);
 
-  const addElement = (element) => {
-    setElementList((oldElementList) => {
-      const newElementList = [...oldElementList, element];
-      // storage.setItem(
-      //   STORAGE_KEY_LIST,
-      //   JSON.stringify({ elementList: newElementList })
-      // );
-      elementListRef.current = newElementList;
-      return newElementList;
-    });
-  };
-
-  const updateElement = (updatedElement) => {
-    setElementList((oldElementList) => {
-      const newElementList = [...oldElementList].map((element) => {
-        if (element.id === updatedElement.id) {
-          return updatedElement;
+  // SELECT / UPDATE / UNSELECT ELEMENT --------------------------------------
+  const setElementSelected = (element) => {
+    if (elementSelected) {
+      const newElementList = [...elementList].map((element) => {
+        if (element.id === elementSelected.id) {
+          return { ...elementSelected };
         }
         return element;
       });
-      // storage.setItem(
-      //   STORAGE_KEY_LIST,
-      //   JSON.stringify({ elementList: newElementList })
-      // );
-      elementListRef.current = newElementList;
-      return newElementList;
-    });
+      setElementList(newElementList);
+      saveContent(newElementList);
+    }
+    set_elementSelected(element);
   };
 
+  // ADD ELEMENT --------------------------------------
+  const addElement = (element) => {
+    const newElementList = [...elementList, element];
+    setElementList(newElementList);
+    setElementSelected(element);
+  };
+
+  // TOGGLE VISIBILITY ELEMENT --------------------------------------
+  const toggleElementVisibility = (elementId) => {
+    const newElementList = [...elementList].map((oldElement) => {
+      if (oldElement.id === elementId) {
+        const elem =
+          oldElement[portadaSizeId] ||
+          ELEMENT_TYPES[oldElement?.type]?.defaultValue;
+
+        return {
+          ...oldElement,
+          [portadaSizeId]: {
+            ...elem,
+            visible: !elem.visible,
+          },
+        };
+      }
+      return oldElement;
+    });
+    setElementList(newElementList);
+    saveContent(newElementList);
+  };
+
+  // MOVE UP-DOWN ELEMENT --------------------------------------
   const moveUpDownElement = (index, dir) => {
-    setElementList((oldElementList) => {
-      const newElementList = moveElement(oldElementList, index, index + dir);
-      // storage.setItem(
-      //   STORAGE_KEY_LIST,
-      //   JSON.stringify({ elementList: newElementList })
-      // );
-      elementListRef.current = newElementList;
-      return newElementList;
-    });
+    const newElementList = moveElement(elementList, index, index + dir);
+    setElementList(newElementList);
+    saveContent(newElementList);
   };
 
+  // REMOVE ELEMENT --------------------------------------
   const removeElement = (id) => {
-    setElementList((oldElementList) => {
-      const newElementList = [...oldElementList].filter(
-        (element) => element.id !== id
-      );
-      // storage.setItem(
-      //   STORAGE_KEY_LIST,
-      //   JSON.stringify({ elementList: newElementList })
-      // );
-      elementListRef.current = newElementList;
-      return newElementList;
-    });
+    const newElementList = [...elementList].filter(
+      (element) => element.id !== id
+    );
+    set_elementSelected(null);
+    setElementList(newElementList);
+    saveContent(newElementList);
   };
 
+  // DUPLICATE ELEMENT --------------------------------------
+  const duplicateElement = (id) => {
+    const newElementList = [];
+    [...elementList].forEach((element) => {
+      newElementList.push(element);
+      if (element.id === id) {
+        newElementList.push({ ...element, id: getUUID() + "_d" });
+      }
+    });
+    setElementList(newElementList);
+    saveContent(newElementList);
+  };
+
+  // UPDATE LIST --------------------------------------
   const updateList = (updatedList) => {
     setElementList(updatedList);
-    // storage.setItem(
-    //   STORAGE_KEY_LIST,
-    //   JSON.stringify({ elementList: updatedList })
-    // );
-    elementListRef.current = updatedList;
+    saveContent(updatedList);
+    set_elementSelected(null);
   };
 
-  const duplicateElement = (id) => {
-    setElementList((oldElementList) => {
-      const newElementList = [];
-
-      [...oldElementList].forEach((element) => {
-        newElementList.push(element);
-        if (element.id === id) {
-          newElementList.push({ ...element, id: getUUID() + "_d" });
-        }
-      });
-      // storage.setItem(
-      //   STORAGE_KEY_LIST,
-      //   JSON.stringify({ elementList: newElementList })
-      // );
-      elementListRef.current = newElementList;
-      return newElementList;
-    });
-  };
-
-  /////////////////////////
-
+  // IMAGE POOL --------------------------------------
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const imagePool = useRef({}); //useImages(imageList);
 
@@ -202,39 +211,11 @@ export const MainContextProvider = ({ children }) => {
     });
   }, [elementList, portadaSizeId]);
 
+  // PORTADA SIZE ID --------------------------------------
   const setPortadaSizeId = (id) => {
     set_portadaSizeId(id);
     storage.setItem(STORAGE_KEY_PORTADA_ID, id);
   };
-
-  const saveContent = () => {
-    // storage.setItem(
-    //   STORAGE_KEY_LIST,
-    //   JSON.stringify({ elementList: elementListRef.current })
-    // );
-  };
-
-  useEffect(() => {
-    let count = 1;
-
-    const saveContentStorage = () => {
-      if (elementListRef.current) {
-        console.log(`Guardando nº ${count++}`);
-        storage.setItem(
-          STORAGE_KEY_LIST,
-          JSON.stringify({ elementList: elementListRef.current })
-        );
-      }
-    };
-
-    let timer = setInterval(() => {
-      saveContentStorage();
-    }, 20000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   return (
     <MainContext.Provider
@@ -243,10 +224,12 @@ export const MainContextProvider = ({ children }) => {
         setPortadaSizeId,
         moveRatio,
         elementList,
+        elementSelected,
+        setElementSelected,
         updateList,
         addElement,
         removeElement,
-        updateElement,
+        toggleElementVisibility,
         moveUpDownElement,
         removeElement,
         duplicateElement,

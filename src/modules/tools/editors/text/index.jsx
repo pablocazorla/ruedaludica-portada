@@ -6,15 +6,6 @@ import InputText from "@/components/inputs/text";
 import Textarea from "@/components/inputs/textarea";
 import { FONT_FAMILIES, FONT_WEIGHTS, TEXT_ALIGNS } from "@/config/constants";
 
-export const TextLabel = ({ element }) => {
-  return (
-    <div className="flex items-center gap-1 text-sm">
-      <div className="font-bold">Texto:</div>
-      <div className="h-5 overflow-hidden opacity-40">{element.text}</div>
-    </div>
-  );
-};
-
 const TextTool = ({ element, onChange }) => {
   const {
     text,
