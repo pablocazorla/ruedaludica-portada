@@ -19,9 +19,9 @@ const PresetsModal = () => {
       >
         Presets
       </button>
-      <Modal open={open} onClose={toggle}>
+      <Modal open={open} onClose={toggle} size="sm">
         <h2 className="font-bold text-xl mb-3">Cargar Preset</h2>
-        <div className="flex flex-col max-w-2xs gap-3">
+        <div className="flex flex-col gap-3">
           {presets.map(({ name, elementList }) => {
             return (
               <button
@@ -36,6 +36,16 @@ const PresetsModal = () => {
               </button>
             );
           })}
+          <hr className="border-gray-500 w-full" />
+          <button
+            className="bg-red-800 text-white font-bold uppercase px-3 py-1 text-xs rounded-md cursor-pointer transition-colors hover:bg-red-900"
+            onClick={() => {
+              updateList([]);
+              toggle();
+            }}
+          >
+            Clear
+          </button>
         </div>
       </Modal>
     </>

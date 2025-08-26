@@ -27,6 +27,14 @@ const Content = ({ toggle }) => {
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
+      <div className="flex justify-end px-6">
+        <button
+          className="bg-red-800 text-white font-bold uppercase px-3 py-1 text-xs rounded-md cursor-pointer transition-colors hover:bg-red-900"
+          onClick={() => setContent("[]")}
+        >
+          Clear
+        </button>
+      </div>
     </Modal>
   );
 };

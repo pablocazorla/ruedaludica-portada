@@ -8,6 +8,7 @@ const Modal = ({ children, size = "lg", okButton, open, onClose }) => {
       <div
         className={cx("bg-gray-700 mx-auto w-full rounded-lg", {
           "max-w-4xl": size === "lg",
+          "max-w-96": size === "sm",
         })}
       >
         <header className="flex items-center justify-end">

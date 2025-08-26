@@ -1,6 +1,7 @@
 import { ruedaLudica } from "./rueda-ludica";
-import { partidaVivo } from "./partida-vivo";
+import { cazangangas } from "./cazagangas";
+//import { partidaVivo } from "./partida-vivo";
 
-const presets = [ruedaLudica, partidaVivo];
+const presets = [ruedaLudica, cazangangas /*,partidaVivo*/];
 
 export default presets;
