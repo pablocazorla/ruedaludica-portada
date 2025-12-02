@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+body {
+  background-color: #333;
+  color: #fff;
+  overflow: hidden;
+}
+
+.scrollbar-custom {
+  scrollbar-color: #666b72 #000;
+}
