@@ -54,18 +54,21 @@ const renderImage = (ctx, ops, imagePool) => {
   if (blur > 0) {
     ctx.filter = `blur(${blur}px)`;
   }
-
-  ctx.drawImage(
-    img,
-    0,
-    0,
-    width,
-    height,
-    x + (crop ? x_crop : 0),
-    y + (crop ? y_crop : 0),
-    width_d,
-    height_d
-  );
+  try {
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      width,
+      height,
+      x + (crop ? x_crop : 0),
+      y + (crop ? y_crop : 0),
+      width_d,
+      height_d
+    );
+  } catch (error) {
+    console.error(error);
+  }
 
   ctx.restore();
   if (crop && show_crop) {
